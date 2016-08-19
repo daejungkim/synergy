@@ -1240,6 +1240,17 @@ MSWindowsScreen::onKey(WPARAM wParam, LPARAM lParam)
 							((lParam & 0x80000000u) == 0),
 							((lParam & 0x40000000u) != 0),
 							key, mask, (SInt32)(lParam & 0xffff), button);
+
+			// Korean 103/106 keyboard does not break Hangul/Hanja key.
+			// So we should send up event for them.
+			if ((key == kKeyHangul && (button == 0x1f2u)) ||
+				(key == kKeyHanja && (button == 0x1f1u))) {
+				m_keyState->onKey(button, false, state);
+				m_keyState->sendKeyEvent(getEventTarget(),
+								false,
+								false,
+								key, mask, (SInt32)(lParam & 0xffff), button);
+			}
 		}
 		else {
 			LOG((CLOG_DEBUG1 "cannot map key"));
